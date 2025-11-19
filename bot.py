@@ -196,12 +196,36 @@ async def cmd_panel(message: types.Message):
 
 
 
+# Reverse morse → lotin
+REV_MORSE = {v: k for k, v in MORSE.items()}
+
+
+def is_morse(text: str) -> bool:
+    """Matn morse kodmi yoki yo‘q — tekshiradi"""
+    allowed = {'.', '-', '/', ' '}
+    return all(ch in allowed for ch in text)
+
+
 def text_to_morse(text: str):
-    return " ".join(MORSE.get(ch.upper(), '/') for ch in text)
+    """Lotindan morzega"""
+    return " ".join(MORSE.get(ch.upper(), '') for ch in text if ch.upper() in MORSE)
 
 
-# Inline query handler
-# INLINE HANDLER (to'g‘rilangan)
+def morse_to_text(text: str):
+    """Morsedan lotinga"""
+    parts = text.split(" ")  # har bir kod bo‘shliq bilan ajratiladi
+    decoded = []
+
+    for code in parts:
+        if code in REV_MORSE:
+            decoded.append(REV_MORSE[code])
+        else:
+            # noma'lum inputlarni o‘tkazib yuboramiz
+            pass
+
+    return "".join(decoded)
+
+
 @dp.inline_query()
 async def inline_morse(query: InlineQuery):
     text = query.query.strip()
@@ -209,20 +233,24 @@ async def inline_morse(query: InlineQuery):
     if not text:
         return
 
-    morse = text_to_morse(text)
+    # AUTO-DETECT
+    if is_morse(text):
+        result_text = morse_to_text(text)
+    else:
+        result_text = text_to_morse(text)
 
+    # Inline natija
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title="🔎 Morse tarjima",
-            description=morse,
+            title="🔄 Auto Morse ↔ Text",
+            description=result_text,
             input_message_content=InputTextMessageContent(
-                message_text=morse  # foydalanuvchi bosganda chatga shu yuboriladi
+                message_text=result_text
             )
         )
     ]
 
-    # Aiogram v3 uchun **TO‘G‘RI JAVOB**
     await query.answer(result, cache_time=0)
 
 # General message handler (no commands) — core behavior for users
