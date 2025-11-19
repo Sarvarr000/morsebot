@@ -197,7 +197,7 @@ async def cmd_panel(message: types.Message):
 
 
 def to_morse(text: str):
-    return " ".join(MORSE.get(ch.upper(), '?') for ch in text)
+    return " ".join(MORSE.get(ch.upper(), '/') for ch in text)
 
 
 @dp.message(Command("start"))
