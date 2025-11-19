@@ -6,7 +6,7 @@ from pathlib import Path
 from aiohttp import web
 
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
+from aiogram.types import InlineKeyboardMarkup,InlineQuery, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 from aiogram.filters import Command
 from aiogram.client.default import DefaultBotProperties
 import uuid
@@ -194,27 +194,36 @@ async def cmd_panel(message: types.Message):
     kb = admin_panel_kb()
     await message.reply("Admin panel — tugmalar orqali boshqarish.", reply_markup=kb)
 
+
+
+def to_morse(text: str):
+    out = []
+    for ch in text.upper():
+        out.append(MORSE.get(ch, '?'))
+    return ' '.join(out)
+
 # Inline query handler
-async def inline_morse(inline_query: types.InlineQuery):
-    text = inline_query.query.upper()  # Lotin matnini katta harfga o'tkazamiz
-    if not text:  # Agar foydalanuvchi hech nima yozmagan bo'lsa
+async def inline_handler(query: InlineQuery):
+    text = query.query.strip()
+
+    if not text:
         return
 
-    # Matnni morse ga tarjima qilish
-    morse_text = " ".join(MORSE.get(char, "") for char in text)
+    morse = to_morse(text)
 
-    # Inline javob tayyorlash
-    result_id = str(uuid.uuid4())
-    results = [
+    result = [
         InlineQueryResultArticle(
-            id=result_id,
-            title="Morse Code",
-            input_message_content=InputTextMessageContent(morse_text),
-            description=morse_text
+            id=str(uuid.uuid4()),
+            title="🔎 Morzega o‘girish",
+            description=morse,
+            input_message_content=InputTextMessageContent(
+                message_text=morse
+            )
         )
     ]
 
-    await bot.answer_inline_query(inline_query.id, results, cache_time=1)
+    await bot.answer_inline_query(query.id, results=result, cache_time=0)
+
 
 # General message handler (no commands) — core behavior for users
 @dp.message()
