@@ -199,59 +199,68 @@ async def cmd_panel(message: types.Message):
 # Reverse morse → lotin
 REV_MORSE = {v: k for k, v in MORSE.items()}
 
+# LOTIN → MORSE
+def text_to_morse(text: str) -> str:
+    result = []
+    for word in text.upper().split(" "):
+        letters = []
+        for ch in word:
+            if ch in MORSE:
+                letters.append(MORSE[ch])
+        result.append(" ".join(letters))
+    return " / ".join(result)
 
-def is_morse(text: str) -> bool:
-    """Matn morse kodmi yoki yo‘q — tekshiradi"""
-    allowed = {'.', '-', '/', ' '}
-    return all(ch in allowed for ch in text)
+# MORSE → LOTIN
+def morse_to_text(text: str) -> str:
+    words = text.split(" / ")  # so‘zlar bo‘yicha ajratish
+    decoded_words = []
+
+    for word in words:
+        letters = word.split(" ")
+        decoded = []
+        for code in letters:
+            if code in REV_MORSE:
+                decoded.append(REV_MORSE[code])
+        decoded_words.append("".join(decoded))
+
+    return " ".join(decoded_words)
 
 
-def text_to_morse(text: str):
-    """Lotindan morzega"""
-    return " ".join(MORSE.get(ch.upper(), '/') for ch in text if ch.upper() in MORSE)
+# MORSE yoki LOTIN ekanligini aniqlash
+def detect_type(q: str):
+    allowed = set(".-/ ")
+    return "morse" if all(ch in allowed for ch in q.strip()) else "text"
 
 
-def morse_to_text(text: str):
-    """Morsedan lotinga"""
-    parts = text.split("/")  # har bir kod bo‘shliq bilan ajratiladi
-    decoded = []
-
-    for code in parts:
-        if code in REV_MORSE:
-            decoded.append(REV_MORSE[code])
-        else:
-            # noma'lum inputlarni o‘tkazib yuboramiz
-            pass
-
-    return "".join(decoded)
-
-
+# INLINE HANDLER
 @dp.inline_query()
 async def inline_morse(query: InlineQuery):
-    text = query.query.strip()
-
-    if not text:
+    if not query.query.strip():
         return
 
-    # AUTO-DETECT
-    if is_morse(text):
-        result_text = morse_to_text(text)
-    else:
-        result_text = text_to_morse(text)
+    q = query.query.strip()
+    mode = detect_type(q)
 
-    # Inline natija
+    if mode == "text":
+        translated = text_to_morse(q)
+        title = "Matn ➝ Morse"
+    else:
+        translated = morse_to_text(q)
+        title = "Morse ➝ Matn"
+
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title="🔄 Auto Morse ↔ Text",
-            description=result_text,
+            title=title,
+            description=translated,
             input_message_content=InputTextMessageContent(
-                message_text=result_text
-            )
+                message_text=translated
+            ),
         )
     ]
 
     await query.answer(result, cache_time=0)
+
 
 # General message handler (no commands) — core behavior for users
 @dp.message()
