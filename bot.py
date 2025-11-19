@@ -205,29 +205,23 @@ async def start_cmd(message: Message):
     await message.answer("Inline Morse bot ishga tayyor!\nMisol: @YourBot hello")
 
 # Inline query handler
-
 @dp.inline_query()
-async def inline_handler(query: InlineQuery):
-
-    text = query.query.strip()
-    if not text:
+async def test_inline(q: InlineQuery):
+    if not q.query:
         return
-
-    morse = to_morse(text)
 
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title=f"Morse tarjima",
-            description=morse,
+            title="Test ishlayaptimi?",
+            description=q.query,
             input_message_content=InputTextMessageContent(
-                message_text=morse
-            )
+                message_text="Inline ishladi!"
+            ),
         )
     ]
 
-    # AIROGRAM 3 DA TO‘G‘RI YO‘LI
-    await query.answer(result, cache_time=0)
+    await q.answer(result, cache_time=0)
 
 
 # General message handler (no commands) — core behavior for users
@@ -449,3 +443,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+asyncio.run(main())
