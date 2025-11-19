@@ -1,0 +1,22 @@
+{
+  "users": {
+    "1781733822": {
+      "id": 1781733822,
+      "username": "Maruf_Sharipov",
+      "first_name": "Ma'ruf",
+      "last_name": ""
+    },
+    "1529689405": {
+      "id": 1529689405,
+      "username": "BintuMirkamol",
+      "first_name": "Missdina♥",
+      "last_name": ""
+    }
+  },
+  "admins": [
+    1781733822
+  ],
+  "superadmin": 1781733822,
+  "required_channels": [],
+  "pending": {}
+}
