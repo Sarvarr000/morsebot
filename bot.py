@@ -3,6 +3,7 @@ import asyncio
 import json
 import re
 from pathlib import Path
+from aiohttp import web
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
@@ -411,8 +412,21 @@ async def errors_handler(update, exception):
     print(f"Error: {exception}")
     return True
 
+async def handle(request):
+    return web.Response(text="Bot is alive ✅")
+
+async def start_web():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", 10000)  # Render port, agar boshqacha bo‘lsa .env orqali olishingiz mumkin
+    await site.start()
+
+
 # Run
 async def main():
+    await start_web()
     print("Bot ishga tushmoqda...")
     try:
         await dp.start_polling(bot)
