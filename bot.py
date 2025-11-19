@@ -200,23 +200,21 @@ def to_morse(text: str):
     return " ".join(MORSE.get(ch.upper(), '/') for ch in text)
 
 
-@dp.message(Command("start"))
-async def start_cmd(message: Message):
-    await message.answer("Inline Morse bot ishga tayyor!\nMisol: @YourBot hello")
 
 # Inline query handler
 @dp.inline_query()
 async def test_inline(q: InlineQuery):
     if not q.query:
         return
+    morse=to_morse(q.query)
 
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title="Test ishlayaptimi?",
+            title="🔎 Morse tarjima",
             description=q.query,
             input_message_content=InputTextMessageContent(
-                message_text="Inline ishladi!"
+                message_text="morse"
             ),
         )
     ]
