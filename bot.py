@@ -196,31 +196,34 @@ async def cmd_panel(message: types.Message):
 
 
 
-def to_morse(text: str):
+def text_to_morse(text: str):
     return " ".join(MORSE.get(ch.upper(), '/') for ch in text)
 
 
-
 # Inline query handler
+# INLINE HANDLER (to'g‘rilangan)
 @dp.inline_query()
-async def test_inline(q: InlineQuery):
-    if not q.query:
+async def inline_morse(query: InlineQuery):
+    text = query.query.strip()
+
+    if not text:
         return
-    morse=to_morse(q.query)
+
+    morse = text_to_morse(text)
 
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
             title="🔎 Morse tarjima",
-            description=q.query,
+            description=morse,
             input_message_content=InputTextMessageContent(
-                message_text="morse"
-            ),
+                message_text=morse  # foydalanuvchi bosganda chatga shu yuboriladi
+            )
         )
     ]
 
-    await q.answer(result, cache_time=0)
-
+    # Aiogram v3 uchun **TO‘G‘RI JAVOB**
+    await query.answer(result, cache_time=0)
 
 # General message handler (no commands) — core behavior for users
 @dp.message()
