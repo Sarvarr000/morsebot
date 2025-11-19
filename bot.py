@@ -7,6 +7,7 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 from aiogram.filters import Command
+from aiogram.client.default import DefaultBotProperties
 import uuid
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -15,7 +16,10 @@ BOT_TOKEN = "8533360770:AAF7kZ024e0x3tdVaA0kenOA3tMXhSE4rVM"
 SUPERADMIN_ID = 1781733822
 DATA_FILE = "data.json"
 
-bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+bot = Bot(
+    token=BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode="HTML")
+)
 dp = Dispatcher()
 
 DATA_DEFAULT = {
