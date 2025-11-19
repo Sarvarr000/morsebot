@@ -208,12 +208,12 @@ def is_morse(text: str) -> bool:
 
 def text_to_morse(text: str):
     """Lotindan morzega"""
-    return " ".join(MORSE.get(ch.upper(), '') for ch in text if ch.upper() in MORSE)
+    return " ".join(MORSE.get(ch.upper(), '/') for ch in text if ch.upper() in MORSE)
 
 
 def morse_to_text(text: str):
     """Morsedan lotinga"""
-    parts = text.split(" ")  # har bir kod bo‘shliq bilan ajratiladi
+    parts = text.split("/")  # har bir kod bo‘shliq bilan ajratiladi
     decoded = []
 
     for code in parts:
