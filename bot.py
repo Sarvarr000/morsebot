@@ -222,7 +222,7 @@ async def inline_handler(query: InlineQuery):
         )
     ]
 
-    await bot.answer_inline_query(query.id, results=result, cache_time=0)
+    await query.answer(results=result, cache_time=0)
 
 
 # General message handler (no commands) — core behavior for users
