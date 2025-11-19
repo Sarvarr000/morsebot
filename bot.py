@@ -6,7 +6,7 @@ from pathlib import Path
 from aiohttp import web
 
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.types import InlineKeyboardMarkup,InlineQuery, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
+from aiogram.types import InlineKeyboardMarkup,InlineQuery, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent, Message
 from aiogram.filters import Command
 from aiogram.client.default import DefaultBotProperties
 import uuid
@@ -197,15 +197,19 @@ async def cmd_panel(message: types.Message):
 
 
 def to_morse(text: str):
-    out = []
-    for ch in text.upper():
-        out.append(MORSE.get(ch, '?'))
-    return ' '.join(out)
+    return " ".join(MORSE.get(ch.upper(), '?') for ch in text)
+
+
+@dp.message(Command("start"))
+async def start_cmd(message: Message):
+    await message.answer("Inline Morse bot ishga tayyor!\nMisol: @YourBot hello")
 
 # Inline query handler
-async def inline_handler(query: InlineQuery):
-    text = query.query.strip()
 
+@dp.inline_query()
+async def inline_handler(query: InlineQuery):
+
+    text = query.query.strip()
     if not text:
         return
 
@@ -214,7 +218,7 @@ async def inline_handler(query: InlineQuery):
     result = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title="🔎 Morzega o‘girish",
+            title=f"Morse tarjima",
             description=morse,
             input_message_content=InputTextMessageContent(
                 message_text=morse
@@ -222,7 +226,8 @@ async def inline_handler(query: InlineQuery):
         )
     ]
 
-    await query.answer(results=result, cache_time=0)
+    # AIROGRAM 3 DA TO‘G‘RI YO‘LI
+    await query.answer(result, cache_time=0)
 
 
 # General message handler (no commands) — core behavior for users
